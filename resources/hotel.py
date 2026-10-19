@@ -29,8 +29,17 @@ class Hotel(Resource):
         data = Hotel.args.parse_args() # Dictionary with the data sent in the request
         for hotel in hotels:
             if hotel["hotel_id"] == id_hotel:
-                return { "message": f"Hotel '{id_hotel}' already exists!" }, 400
+                hotel_updated = { "hotel_id": id_hotel, **data }
+                hotel.update(hotel_updated)
+                return hotel_updated, 200 # OK
+                # return { "message": f"Hotel '{id_hotel}' already exists!" }, 400
 
         new_hotel = { "hotel_id": id_hotel, **data }
         hotels.append(new_hotel)
-        return { "message": f"Hotel '{id_hotel}' created successfully!" }, 200
+        return new_hotel, 201 # Created 
+
+    def delete(self, id_hotel) -> dict[str, str]:
+        """Delete the hotel with the specified ID."""
+        global hotels
+        hotels = [hotel for hotel in hotels if hotel["hotel_id"] != id_hotel]
+        return {"message": f"{str(id_hotel).capitalize()} Hotel has been deleted!"}
